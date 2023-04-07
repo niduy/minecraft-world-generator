@@ -1,0 +1,46 @@
+@font-face {
+	font-family: 'MinecraftRegular';
+	src: url('font/MinecraftRegular.otf') format('opentype');
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'MinecraftBold';
+	src: url('font/MinecraftBold.otf') format('opentype');
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'MinecraftItalic';
+	src: url('font/MinecraftItalic.otf') format('opentype');
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'MinecraftBoldItalic';
+	src: url('font/MinecraftBoldItalic.otf') format('opentype');
+	font-style: normal;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html {
+	background: url('background.png') no-repeat center center fixed;
+	background-size: cover;
+}
+
+html,
+button,
+input {
+	font-family: 'MinecraftRegular';
+}
+
+img,
+main,
+div {
+	image-rendering: pixelated;
+}
