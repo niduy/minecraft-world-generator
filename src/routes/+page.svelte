@@ -69,7 +69,11 @@
 <Title text="Minecraft World Generation" />
 
 <p class="note">
-	<a href="http://github.com/niduy" target="_blank" rel="noopener noreferrer">Source Code</a>
+	<a
+		href="http://github.com/niduy/minecraft-world-generation"
+		target="_blank"
+		rel="noopener noreferrer">Source Code</a
+	>
 </p>
 
 <div class="container">
