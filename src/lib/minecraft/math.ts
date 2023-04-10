@@ -23,8 +23,6 @@ export const uint64ToInt64 = (x: bigint) => {
 	else return x
 }
 
-console.log(uint64ToInt64(18_446_744_073_709_551_615n))
-
 export const leftShift64 = (a: bigint, b: bigint) => {
 	return (a << b) & MAX_UINT64
 }
@@ -39,6 +37,10 @@ export const rightShift64 = (a: bigint, b: bigint) => {
 
 export const rotl64 = (a: bigint, b: bigint) => {
 	return or64(leftShift64(a, b), rightShift64(a, subtract64(64n, b)))
+}
+
+export const rotr32 = (a: bigint, b: bigint) => {
+	return BigInt(Number(a & MAX_UINT32) >>> Number(b)) | (leftShift64(a, 32n - b) & MAX_UINT32)
 }
 
 export const or64 = (a: bigint, b: bigint) => {

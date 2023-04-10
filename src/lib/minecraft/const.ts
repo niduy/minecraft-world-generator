@@ -1,4 +1,4 @@
-export const BIOME = Object.freeze({
+export const BIOME = {
 	None: -1,
 	Ocean: 0,
 	Plains: 1,
@@ -137,11 +137,11 @@ export const BIOME = Object.freeze({
 	StonyPeaks: 182,
 	DeepDark: 183,
 	MangroveSwamp: 184
-})
+} as const
 
 export const BIOME_VALUES = Object.values(BIOME)
 
-export const STRUCTURE = Object.freeze({
+export const STRUCTURE = {
 	Village: 'Village',
 	AncientCity: 'AncientCity',
 	OceanRuins: 'OceanRuin',
@@ -154,7 +154,7 @@ export const STRUCTURE = Object.freeze({
 	SwampHut: 'SwampHut',
 	Mansion: 'Mansion',
 	PillagerOutpost: 'PillagerOutpost'
-})
+} as const
 
 export const ICON_MAP = {
 	[STRUCTURE.SwampHut]: { x: 80, y: 32 },
@@ -186,7 +186,7 @@ export const STRUCTURE_TO_TEXT = {
 	[STRUCTURE.Village]: 'Village'
 } as const
 
-// Taken from https://github.com/Cubitect/cubiomes
+// Stolen from https://github.com/Cubitect/cubiomes
 export const BIOME_PARAMS = [
 	[-12000n, -10500n],
 	[-12000n, -4550n],
@@ -329,7 +329,7 @@ export const BIOME_PARAMS = [
 	[11000n, 11000n]
 ]
 
-// Taken from https://github.com/Cubitect/cubiomes
+// Stolen from https://github.com/Cubitect/cubiomes
 export const BIOME_TREE: bigint[] = [
 	// Binary encoded biome parameter search tree
 	//

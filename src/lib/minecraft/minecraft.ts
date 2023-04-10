@@ -14,7 +14,8 @@ import {
 	MAX_UINT32,
 	add32,
 	xor32,
-	bswap32
+	bswap32,
+	rotr32
 } from './math'
 import { BIOME, BIOME_PARAMS, BIOME_TREE, BIOME_VALUES, STRUCTURE } from './const'
 
@@ -31,25 +32,24 @@ import type {
 
 const MONUMENT_BIOMES_BINARY = 2234207644421249n
 
-// TODO: convert enums to objects
-enum Climate {
-	Temperature = 0,
-	Humidity = 1,
-	Continentalness = 2,
-	Erosion = 3,
-	PeaksAndValleys = 4,
-	Weirdness = 5
-}
+const Climate = {
+	Temperature: 0,
+	Humidity: 1,
+	Continentalness: 2,
+	Erosion: 3,
+	PeaksAndValleys: 4,
+	Weirdness: 5
+} as const
 
-enum Land {
-	Continentalness = 0,
-	Erosion = 1,
-	PeaksAndValleys = 2
-}
+const Land = {
+	Continentalness: 0,
+	Erosion: 1,
+	PeaksAndValleys: 2
+} as const
 
 class Spline {
 	length = 0
-	type = Land.Continentalness
+	type: (typeof Land)[keyof typeof Land] = Land.Continentalness
 	loc = new Float32Array(12)
 	der = new Float32Array(12)
 	value: FixedSpline[] = new Array(12)
@@ -204,7 +204,6 @@ export class World {
 		m[2] = 0x80000000n
 		m[15] = 0x00000040n
 
-		// TODO: check if this matters
 		for (let i = 16; i < 64; ++i) {
 			m[i] = add32(m[i - 7], m[i - 16])
 			let x = m[i - 15]
@@ -227,10 +226,6 @@ export class World {
 		let a5 = B[5]
 		let a6 = B[6]
 		let a7 = B[7]
-
-		function rotr32(n: bigint, b: bigint) {
-			return BigInt(Number(n & MAX_UINT32) >>> Number(b)) | (leftShift64(n, 32n - b) & MAX_UINT32)
-		}
 
 		for (let i = 0; i < 64; i++) {
 			let x = add32(add32(a7, K[i]), m[i])
@@ -411,7 +406,7 @@ export class World {
 
 	getStructures(config: StructureConfig, sx: number, sz: number, scale: number) {
 		this.setBiomeSeed(this.seed)
-		const result: StructurePosition[] = []
+		const positions: StructurePosition[] = []
 
 		const x0 = Math.floor(sx * scale * 2) * -1
 		const x1 = Math.floor(sx * scale * 2)
@@ -451,14 +446,14 @@ export class World {
 					if (!variant) continue
 				}
 
-				result.push({ ...pos, type: config.type })
+				positions.push({ ...pos, type: config.type })
 			}
 		}
 
-		// TODO: stop using JSON.stringify and JSON.parse
-		return [...new Set(result.map((p) => JSON.stringify(p)))].map((p) =>
-			JSON.parse(p)
-		) as StructurePosition[]
+		return positions.filter((pos, i, self) => {
+			const j = self.findIndex((p) => p.x === pos.x && p.z === pos.z && p.type === pos.type)
+			return i === j
+		})
 	}
 
 	getStructurePos(config: StructureConfig, seed: bigint, regX: number, regZ: number) {
@@ -505,7 +500,6 @@ export class World {
 		let val
 
 		do {
-			// TODO: review that this is correct
 			const [newSeed, int] = this.next(xSeed, 31n)
 			xSeed = newSeed
 			bits = int
@@ -797,8 +791,6 @@ export class World {
 			nb
 		)
 
-		// TODO: remove
-		// trim amplitudes of zero
 		for (i = length - 1; i >= 0 && amplitudes[i] === 0; i--) length--
 		for (i = 0; amplitudes[i] == 0.0; i++) length--
 
@@ -882,7 +874,7 @@ export class World {
 
 		this.biomeNoise.splineStack.fixedStack.push(fixedSpline)
 
-		// TODO: refactor to not use unknown
+		// TODO: refactor to not use type casting
 		return fixedSpline as unknown as Spline
 	}
 
@@ -1015,7 +1007,7 @@ export class World {
 		return sp
 	}
 
-	// TODO: convert to a static class
+	// TODO: convert to a pre-generated variable
 	initBiomeNoise() {
 		const splineStack = this.biomeNoise.splineStack
 		const spline = splineStack.stack[splineStack.length++]
@@ -1045,7 +1037,6 @@ export class World {
 		const siz = multiply64(BigInt(range.sx), BigInt(range.sy * range.sz))
 		let res: BiomeValue[] = []
 
-		// TODO: replace with betterGenBiomeNoise3D
 		if (range.scale === 1) {
 			const s = this.getVoronoiSrcRange(range)
 			let src: BiomeValue[] | null = null
@@ -1155,7 +1146,6 @@ export class World {
 	}
 
 	voronoiAccess3D(sha: bigint, x: number, y: number, z: number) {
-		// TODO: don't modify the input params
 		x -= 2
 		y -= 2
 		z -= 2
@@ -1163,12 +1153,14 @@ export class World {
 		const pX = rightShift32(x, 2)
 		const pY = rightShift32(y, 2)
 		const pZ = rightShift32(z, 2)
+
 		const dx = (x & 3) * 10240
 		const dy = (y & 3) * 10240
 		const dz = (z & 3) * 10240
-		let ax = 0,
-			ay = 0,
-			az = 0
+
+		let ax = 0
+		let ay = 0
+		let az = 0
 		let dmin = 2 ** 64 - 1
 
 		for (let i = 0; i < 8; i++) {
@@ -1444,7 +1436,7 @@ export class World {
 		}
 	}
 
-	// TODO: refactor to not have return types
+	// TODO: refactor to not have return return types
 	getSpline(vals: number[], sp: FixedSpline): number
 	getSpline(vals: number[], sp: Spline): number
 	getSpline(vals: number[], sp: Spline | FixedSpline): FixedSpline | number {
@@ -2125,6 +2117,7 @@ export class World {
 					BIOME.Meadow,
 					BIOME.Beach
 				]
+
 				for (const biome of biomes) {
 					const sv = this.getVariant(STRUCTURE.Village, this.seed, x, z, biome)
 					if (!sv) continue
@@ -2139,22 +2132,21 @@ export class World {
 			case STRUCTURE.PillagerOutpost: {
 				let rng = this.seed
 				this.setAttemptSeed(rng, chunkX, chunkZ)
-				if (this.nextInt(rng, 5) !== 0) {
-					return false
-				}
+				if (this.nextInt(rng, 5) !== 0) return false
+
 				const vilconf = this.getStructureConfig(STRUCTURE.Village)
-				if (!vilconf) {
-					return false
-				}
-				const cx0 = chunkX - 10,
-					cx1 = chunkX + 10
-				const cz0 = chunkZ - 10,
-					cz1 = chunkZ + 10
+				if (!vilconf) return false
+
+				const cx0 = chunkX - 10
+				const cx1 = chunkX + 10
+				const cz0 = chunkZ - 10
+				const cz1 = chunkZ + 10
 				const rx0 = Math.floor(cx0 / Number(vilconf.regionSize)) - (cx0 < 0 ? 1 : 0)
 				const rx1 = Math.floor(cx1 / Number(vilconf.regionSize)) - (cx1 < 0 ? 1 : 0)
 				const rz0 = Math.floor(cz0 / Number(vilconf.regionSize)) - (cz0 < 0 ? 1 : 0)
 				const rz1 = Math.floor(cz1 / Number(vilconf.regionSize)) - (cz1 < 0 ? 1 : 0)
 				let rx, rz
+
 				for (rz = rz0; rz <= rz1; rz++) {
 					for (rx = rx0; rx <= rx1; rx++) {
 						const p = this.getFeaturePosition(vilconf, this.seed, rx, rz)
@@ -2165,6 +2157,7 @@ export class World {
 						}
 					}
 				}
+
 				rng = this.chunkGenerateRnd(this.seed, chunkX, chunkZ)
 				switch (this.nextInt(rng, 4)) {
 					case 0:
@@ -2207,6 +2200,7 @@ export class World {
 				}
 				return false
 			}
+
 			case STRUCTURE.Mansion: {
 				sampleX = (chunkX << 4) + 7
 				sampleZ = (chunkZ << 4) + 7
@@ -2216,12 +2210,13 @@ export class World {
 				}
 				return true
 			}
+
 			case STRUCTURE.RuinedPortal: {
 				return true
 			}
+
 			case STRUCTURE.AncientCity: {
 				const sv = this.getVariant(STRUCTURE.AncientCity, this.seed, x, z, -1)
-				// TODO: check if this is going to be a problem
 				if (!sv) return false
 
 				sampleX = (((chunkX << 5) + 2 * sv.x + sv.sx) / 2) >> 2

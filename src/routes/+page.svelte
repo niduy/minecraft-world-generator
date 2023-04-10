@@ -14,10 +14,10 @@
 	const rangeConfig = writable<RangeConfig>('small')
 	const seed = writable(12370816993565n)
 
-	const buttons: { config: RangeConfig; title: string; note: string }[] = [
-		{ config: 'small', title: 'Small', note: '256x256' },
-		{ config: 'medium', title: 'Medium', note: '512x512' },
-		{ config: 'large', title: 'Large', note: '1024x1024' }
+	const buttons: { config: RangeConfig; title: string }[] = [
+		{ config: 'small', title: 'Small' },
+		{ config: 'medium', title: 'Medium' },
+		{ config: 'large', title: 'Large' }
 	]
 
 	const structureList = Object.values(STRUCTURE).map((key) => STRUCTURE_TO_TEXT[key])
@@ -62,11 +62,13 @@
 </script>
 
 <svelte:head>
-	<title>Minecraft World Generation</title>
-	<meta name="description" content="Minecraft World Generation 1.19.3" />
+	<title>Minecraft World Generator</title>
+	<meta name="description" content="Minecraft World Generator 1.19.4" />
 </svelte:head>
 
-<Title text="Minecraft World Generation" />
+<Title text="Minecraft World Generator" />
+
+<p class="note">Version: 1.19.4</p>
 
 <p class="note">
 	<a
