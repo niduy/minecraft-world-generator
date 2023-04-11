@@ -4,23 +4,24 @@ export const MAX_UINT32 = 4_294_967_295n
 const UINT64_WRAPUP = MAX_UINT64 + 1n
 const UINT32_WRAPUP = MAX_UINT32 + 1n
 
-const INT64_MOST_SIGNIFICANT_BIT = BigInt('0x8000000000000000')
-const INT32_MOST_SIGNIFICANT_BIT = BigInt('0x80000000')
-
 export const lerp = (part: number, from: number, to: number) => {
 	return from + part * (to - from)
 }
 
+const uint64ToInt32Buffer = new ArrayBuffer(8)
+const uint64ToInt32U64View = new BigUint64Array(uint64ToInt32Buffer)
+const uint64ToInt32I32View = new Int32Array(uint64ToInt32Buffer)
 export const uint64ToInt32 = (x: bigint) => {
-	const a = x & MAX_UINT32
-
-	if (a >= INT32_MOST_SIGNIFICANT_BIT) return Number(a - UINT32_WRAPUP)
-	else return Number(a)
+	uint64ToInt32U64View[0] = x
+	return uint64ToInt32I32View[0]
 }
 
+const uint64ToInt64Buffer = new ArrayBuffer(8)
+const uint64ToInt64U64View = new BigUint64Array(uint64ToInt64Buffer)
+const uint64ToInt64I64View = new BigInt64Array(uint64ToInt64Buffer)
 export const uint64ToInt64 = (x: bigint) => {
-	if (x >= INT64_MOST_SIGNIFICANT_BIT) return x - UINT64_WRAPUP
-	else return x
+	uint64ToInt64U64View[0] = x
+	return uint64ToInt64I64View[0]
 }
 
 export const leftShift64 = (a: bigint, b: bigint) => {
