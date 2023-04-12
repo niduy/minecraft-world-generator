@@ -79,8 +79,8 @@ export const intToUint64 = (x: number | bigint) => {
 
 export const bswap32 = (n: bigint) => {
 	return (
-		BigInt((Number(n) & 0xff000000 & Number(MAX_UINT32)) >>> 24) |
-		BigInt((Number(n) & 0x00ff0000 & Number(MAX_UINT32)) >>> 8) |
+		BigInt(Number(n & 0xff000000n & MAX_UINT32) >>> 24) |
+		BigInt(Number(n & 0x00ff0000n & MAX_UINT32) >>> 8) |
 		((n & 0x0000ff00n) << 8n) |
 		(((n & 0x000000ffn) << 24n) & MAX_UINT32)
 	)
