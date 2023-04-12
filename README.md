@@ -27,6 +27,7 @@ npm run build && npm run preview
 - [Cubiome](https://github.com/Cubitect/cubiomes) - C implementation of the algorithm
 - [MCP-Reborn](https://github.com/Hexeption/MCP-Reborn) - view Minecraft's source code
 - [Minecraft terrain generation in a nutshell](https://www.youtube.com/watch?v=CSa5O6knuwI) - Minecraft's world generation algorithm overview
+- [Fandom Minecraft Wiki](https://minecraft.fandom.com/wiki/Minecraft_Wiki) - icons
 
 ## License
 
